@@ -15,7 +15,6 @@ NLP project for automated fact-checking and explanation generation on the [PUBHE
   - [3. Classification Models](#3-classification-models)
   - [4. Ensemble Methods](#4-ensemble-methods)
   - [5. Explanation Generation](#5-explanation-generation)
-- [Results](#results)
 - [Environment Setup](#environment-setup)
 - [Running on the Cluster (SLURM)](#running-on-the-cluster-slurm)
 
