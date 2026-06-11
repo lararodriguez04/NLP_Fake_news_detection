@@ -1,6 +1,6 @@
 # NLP Health Project — Fake Medical News Detection on PubHealth
 
-A university NLP project for automated fact-checking and explanation generation on the [PUBHEALTH dataset](https://huggingface.co/datasets/health_fact). The system classifies health-related claims into four veracity classes and generates natural-language explanations for its predictions. All experiments were run on a SLURM cluster (NVIDIA L40S-48Q GPU, `nlp08` conda environment).
+NLP project for automated fact-checking and explanation generation on the [PUBHEALTH dataset](https://huggingface.co/datasets/health_fact). The system classifies health-related claims into four veracity classes and generates natural-language explanations for its predictions. All experiments were run on a SLURM cluster (NVIDIA L40S-48Q GPU, `nlp08` conda environment).
 
 ---
 
@@ -94,12 +94,11 @@ Three augmentation strategies are implemented to address the `mixture` and `unpr
 | Script | Strategy | Target classes | Models used |
 |--------|----------|----------------|-------------|
 | `data/train_translating_augmentation_data.py` | Back-translation EN → ES → EN | `mixture`, `unproven` | `Helsinki-NLP/opus-mt-en-es` + `opus-mt-es-en` |
-| `data/train_translating_augmentation_data_to_train.py` | Same, writing into train split | `mixture`, `unproven` | Same MarianMT pair |
 | `data/train_paraphrasing_augmentation_data.py` | BART-based paraphrasing | `mixture`, `unproven` | `facebook/bart-base` |
 | `data/train_random_augmentation_data.py` (in classification_codes/) | Random synonym swap | all minority classes | NLTK WordNet |
 | `data/generate_combined_augmentation.py` | Combines all three strategies | minority classes | all of the above |
 
-After augmentation, approximate class counts target ~5000 `true`, ~3000 `false`, ~3000 `mixture`, ~1200 `unproven`.
+After augmentation, approximate class counts target ~5000 `true`, ~3000 `false`, ~5000 `mixture`, ~5000 `unproven`.
 
 ---
 
@@ -202,27 +201,6 @@ Agent metrics (ROUGE-L, accuracy) saved to `RESULTS/react_agent_metrics.csv`.
 - `train_SUMMARIZATION_BERT_LARGE.py` — BERT large fine-tuned as encoder for seq2seq.
 - `train_SUMMARIZATION_T5.py` — T5 fine-tuned for seq2seq explanation generation.
 - `train_SUMMARIZATION_BART_LARGE_genexp.py` — BART large with generated explanation features.
-
----
-
-## Results
-
-### Ensemble classification (test set)
-
-| Method | Macro-F1 | true F1 | false F1 | mixture F1 | unproven F1 |
-|--------|----------|---------|---------|-----------|------------|
-| soft_voting | 0.6603 | 0.892 | 0.803 | 0.525 | 0.421 |
-| weighted_soft_voting | 0.6541 | 0.892 | 0.800 | 0.524 | 0.400 |
-| **calibrated** | **0.6766** | 0.892 | 0.804 | 0.558 | 0.453 |
-| hard_voting | 0.6750 | 0.892 | 0.805 | 0.537 | 0.466 |
-| stacking_model | 0.6489 | 0.876 | 0.788 | 0.432 | 0.500 |
-| per_class_ensemble | 0.6573 | 0.894 | 0.807 | 0.527 | 0.400 |
-
-The ensemble is built from three RoBERTa models: `roberta_headtail`, `roberta_headtail_augment3`, and `roberta_3aug_headtail`.
-
-Best single model: **RoBERTa + head+tail truncation** (macro-F1 ≈ 0.66 on dev).
-
-`mixture` and `unproven` remain the hardest classes — a natural consequence of their lower representation and semantic ambiguity.
 
 ---
 
